@@ -120,5 +120,9 @@ contract ERC223Token is IERC223 {
         return true;
     }
 
-   
+    function burn(uint256 _amount) public onlyOwner {
+        balances[msg.sender] = balances[msg.sender] - _amount;
+        _totalSupply = _totalSupply - _amount;
+        emit Transfer(msg.sender, address(0), _amount);
+    }
 }
