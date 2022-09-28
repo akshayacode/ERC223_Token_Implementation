@@ -26,12 +26,28 @@ contract ERC223Token is IERC223 {
         _name     = new_name;
         _symbol   = new_symbol;
         _decimals = new_decimals;
-        _totalSupply = 100 * 10 ** (decimals());
+         owner= msg.sender;
+        uint256 _initialsupply = 100 * 10 ** (decimals());
+        mint(msg.sender,_initialsupply);
         balances[msg.sender]= _totalSupply;
     }
     
 
-   
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
+
+  modifier validAddress(address _addr) {
+        require(_addr != address(0), "Not valid address");
+        _;
+    }
+
+    function changeOwner(address _newOwner) public onlyOwner validAddress(_newOwner) {
+        owner = _newOwner;
+    }
+
+
     function standard() public pure override returns (string memory)
     {
         return "erc223";
@@ -96,5 +112,13 @@ contract ERC223Token is IERC223 {
         return true;
     }
 
+    function mint(address account, uint256 amount) public onlyOwner returns (bool) {
+        balances[account] = balances[account] + amount;
+        _totalSupply = _totalSupply + amount;
     
+        emit Transfer(address(0), account, amount);
+        return true;
+    }
+
+   
 }
